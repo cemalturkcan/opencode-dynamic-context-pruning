@@ -57,6 +57,9 @@ export function createCompressRangeTool(ctx: ToolContext): ReturnType<typeof too
         description: runtimePrompts.compressRange + RANGE_FORMAT_OVERLAY,
         args: buildSchema(),
         async execute(args, toolCtx) {
+            if (ctx.state.paused) {
+                return "DCP is currently paused. Use /dcp resume to re-enable compression."
+            }
             const input = args as CompressRangeToolArgs
             validateArgs(input)
 

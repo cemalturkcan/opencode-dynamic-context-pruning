@@ -22,7 +22,9 @@ import {
     handleHelpCommand,
     handleManualToggleCommand,
     handleManualTriggerCommand,
+    handlePauseCommand,
     handleRecompressCommand,
+    handleResumeCommand,
     handleStatsCommand,
     handleSweepCommand,
 } from "./commands"
@@ -50,6 +52,11 @@ export function createSystemPromptHandler(
         if (input.model?.limit?.context) {
             state.modelContextLimit = input.model.limit.context
             logger.debug("Cached model context limit", { limit: state.modelContextLimit })
+        }
+
+        if (state.paused) {
+            logger.debug("DCP paused - skipping system prompt injection")
+            return
         }
 
         if (state.isSubAgent && !config.experimental.allowSubAgents) {
@@ -98,6 +105,11 @@ export function createChatMessageTransformHandler(
         await checkSession(client, state, logger, output.messages, config.manualMode.enabled)
 
         syncCompressPermissionState(state, config, hostPermissions, output.messages)
+
+        if (state.paused) {
+            logger.debug("DCP paused - skipping message transform")
+            return
+        }
 
         if (state.isSubAgent && !config.experimental.allowSubAgents) {
             return
@@ -188,6 +200,16 @@ export function createCommandExecuteHandler(
                 messages,
             }
 
+            if (subcommand === "pause") {
+                await handlePauseCommand(commandCtx)
+                throw new Error("__DCP_PAUSE_HANDLED__")
+            }
+
+            if (subcommand === "resume") {
+                await handleResumeCommand(commandCtx)
+                throw new Error("__DCP_RESUME_HANDLED__")
+            }
+
             if (subcommand === "context") {
                 await handleContextCommand(commandCtx)
                 throw new Error("__DCP_CONTEXT_HANDLED__")
@@ -255,11 +277,14 @@ export function createCommandExecuteHandler(
     }
 }
 
-export function createTextCompleteHandler() {
+export function createTextCompleteHandler(state: SessionState) {
     return async (
         _input: { sessionID: string; messageID: string; partID: string },
         output: { text: string },
     ) => {
+        if (state.paused) {
+            return
+        }
         output.text = stripHallucinationsFromString(output.text)
     }
 }

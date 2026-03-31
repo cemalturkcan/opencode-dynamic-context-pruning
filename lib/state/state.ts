@@ -65,6 +65,7 @@ export function createSessionState(): SessionState {
     return {
         sessionId: null,
         isSubAgent: false,
+        paused: false,
         manualMode: false,
         compressPermission: undefined,
         pendingManualTrigger: null,
@@ -100,6 +101,7 @@ export function createSessionState(): SessionState {
 export function resetSessionState(state: SessionState): void {
     state.sessionId = null
     state.isSubAgent = false
+    state.paused = false
     state.manualMode = false
     state.compressPermission = undefined
     state.pendingManualTrigger = null

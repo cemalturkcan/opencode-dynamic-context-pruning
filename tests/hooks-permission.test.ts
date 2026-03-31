@@ -146,7 +146,8 @@ test("chat message hook caches variant even when effective permission is denied"
 
 test("text complete strips hallucinated metadata tags", async () => {
     const output = { text: "alpha <dcp>beta</dcp> omega" }
-    const handler = createTextCompleteHandler()
+    const state = createSessionState()
+    const handler = createTextCompleteHandler(state)
 
     await handler({ sessionID: "session-1", messageID: "message-1", partID: "part-1" }, output)
 

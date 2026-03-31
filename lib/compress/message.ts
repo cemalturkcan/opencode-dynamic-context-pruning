@@ -46,6 +46,9 @@ export function createCompressMessageTool(ctx: ToolContext): ReturnType<typeof t
         description: runtimePrompts.compressMessage + MESSAGE_FORMAT_OVERLAY,
         args: buildSchema(),
         async execute(args, toolCtx) {
+            if (ctx.state.paused) {
+                return "DCP is currently paused. Use /dcp resume to re-enable compression."
+            }
             const input = args as CompressMessageToolArgs
             validateArgs(input)
 

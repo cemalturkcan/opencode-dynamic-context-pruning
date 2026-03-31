@@ -67,7 +67,7 @@ const plugin: Plugin = (async (ctx) => {
             hostPermissions,
         ) as any,
         "chat.message": createChatMessageHandler(state, logger, config, hostPermissions),
-        "experimental.text.complete": createTextCompleteHandler(),
+        "experimental.text.complete": createTextCompleteHandler(state),
         "command.execute.before": createCommandExecuteHandler(
             ctx.client,
             state,

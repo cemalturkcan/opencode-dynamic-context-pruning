@@ -20,6 +20,8 @@ export interface HelpCommandContext {
 }
 
 const BASE_COMMANDS: [string, string][] = [
+    ["/dcp pause", "Pause all DCP processing for this session"],
+    ["/dcp resume", "Resume DCP processing"],
     ["/dcp context", "Show token usage breakdown for current session"],
     ["/dcp stats", "Show DCP pruning statistics"],
     ["/dcp sweep [n]", "Prune tools since last user message, or last n tools"],
@@ -53,6 +55,7 @@ function formatHelpMessage(state: SessionState, config: PluginConfig): string {
     lines.push("│                              DCP Commands                               │")
     lines.push("╰─────────────────────────────────────────────────────────────────────────╯")
     lines.push("")
+    lines.push(`  ${"DCP status:".padEnd(colWidth)}${state.paused ? "PAUSED" : "ACTIVE"}`)
     lines.push(`  ${"Manual mode:".padEnd(colWidth)}${state.manualMode ? "ON" : "OFF"}`)
     lines.push("")
     for (const [cmd, desc] of commands) {
