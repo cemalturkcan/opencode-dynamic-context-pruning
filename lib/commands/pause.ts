@@ -10,8 +10,6 @@
 import type { Logger } from "../logger"
 import type { SessionState, WithParts } from "../state"
 import type { PluginConfig } from "../config"
-import { sendIgnoredMessage } from "../ui/notification"
-import { getCurrentParams } from "../strategies/utils"
 
 const DCP_PAUSED_MSG =
     "DCP is now PAUSED. All hooks are disabled until you run /dcp resume."
@@ -35,31 +33,27 @@ export interface PauseCommandContext {
 }
 
 export async function handlePauseCommand(ctx: PauseCommandContext): Promise<void> {
-    const { client, state, logger, sessionId, messages } = ctx
+    const { client, state, logger } = ctx
 
     if (state.paused) {
-        const params = getCurrentParams(state, messages, logger)
-        await sendIgnoredMessage(client, sessionId, DCP_ALREADY_PAUSED_MSG, params, logger)
+        try { await client.tui.showToast({ body: { title: "DCP", message: DCP_ALREADY_PAUSED_MSG, variant: "info", duration: 3000 } }) } catch {}
         return
     }
 
     state.paused = true
-    const params = getCurrentParams(state, messages, logger)
-    await sendIgnoredMessage(client, sessionId, DCP_PAUSED_MSG, params, logger)
+    try { await client.tui.showToast({ body: { title: "DCP", message: DCP_PAUSED_MSG, variant: "info", duration: 3000 } }) } catch {}
     logger.info("DCP paused by user")
 }
 
 export async function handleResumeCommand(ctx: PauseCommandContext): Promise<void> {
-    const { client, state, logger, sessionId, messages } = ctx
+    const { client, state, logger } = ctx
 
     if (!state.paused) {
-        const params = getCurrentParams(state, messages, logger)
-        await sendIgnoredMessage(client, sessionId, DCP_ALREADY_ACTIVE_MSG, params, logger)
+        try { await client.tui.showToast({ body: { title: "DCP", message: DCP_ALREADY_ACTIVE_MSG, variant: "info", duration: 3000 } }) } catch {}
         return
     }
 
     state.paused = false
-    const params = getCurrentParams(state, messages, logger)
-    await sendIgnoredMessage(client, sessionId, DCP_RESUMED_MSG, params, logger)
+    try { await client.tui.showToast({ body: { title: "DCP", message: DCP_RESUMED_MSG, variant: "info", duration: 3000 } }) } catch {}
     logger.info("DCP resumed by user")
 }
